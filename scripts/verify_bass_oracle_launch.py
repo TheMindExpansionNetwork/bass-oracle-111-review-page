@@ -21,6 +21,7 @@ STREAM_SNAPSHOT = ROOT / "docs/reports/BASS_ORACLE_STREAM_STATUS_SNAPSHOT_202605
 LISTENER_DECISION_MATRIX = ROOT / "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md"
 MORNING_HANDOFF = ROOT / "docs/reports/BASS_ORACLE_MORNING_HANDOFF_20260509-091556.md"
 NIGHTSHIFT_REPORT_GLOB = "BASS_ORACLE_NIGHTSHIFT_REVIEW_*.md"
+NIGHTSHIFT_REPORT_INDEX_GLOB = "BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_*.md"
 
 REQUIRED_ASSETS = [
     ROOT / "docs/launch/assets/bass_oracle_111_avatar.png",
@@ -177,6 +178,44 @@ def verify_nightshift_review_reports() -> None:
             assert not match, f"raw secret or RTMP target in {relative}: {match.group(0)[:48]!r}"
 
 
+def verify_nightshift_report_index() -> None:
+    """Require the latest operator index to enumerate every nightshift review artifact."""
+    indexes = sorted((ROOT / "docs/reports").glob(NIGHTSHIFT_REPORT_INDEX_GLOB))
+    assert indexes, f"missing nightshift report index matching docs/reports/{NIGHTSHIFT_REPORT_INDEX_GLOB}"
+    latest_index = indexes[-1]
+    index_text = latest_index.read_text(encoding="utf-8")
+    relative_index = latest_index.relative_to(ROOT)
+
+    reports = sorted((ROOT / "docs/reports").glob(NIGHTSHIFT_REPORT_GLOB))
+    assert reports, "nightshift report index has no review reports to enumerate"
+    for report in reports:
+        relative_report = str(report.relative_to(ROOT))
+        assert relative_report in index_text, f"{relative_index} missing review path: {relative_report}"
+
+    for required_path in [
+        "docs/launch/bass_oracle_launch_manifest.json",
+        "docs/review_manifest.json",
+        "docs/launch/bass_oracle_034_ready_playlist.m3u",
+        "docs/launch/bass_oracle_034_listening_review.csv",
+        "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md",
+        "docs/reports/BASS_ORACLE_STREAM_STATUS_SNAPSHOT_20260509-081615.md",
+    ]:
+        assert required_path in index_text, f"{relative_index} missing proof anchor: {required_path}"
+        assert (ROOT / required_path).exists(), f"report index proof anchor does not exist: {required_path}"
+
+    for phrase in [
+        "34 / 111 ready tracks",
+        "rtmp://[REDACTED]",
+        "External Kick/Twitch liveness is not checked, not verified, and not claimed.",
+        "Duplicate livestream pusher startup remains closed; this report does not start streams.",
+        "Cron creation/update/removal: closed.",
+    ]:
+        assert phrase in index_text, f"{relative_index} missing closed-gate/index phrase: {phrase}"
+    for pattern in UNSAFE_OVERCLAIM_PATTERNS + SECRET_PATTERNS:
+        match = pattern.search(index_text)
+        assert not match, f"unsafe language or secret in {relative_index}: {match.group(0)[:48]!r}"
+
+
 def verify_operator_handoff_documents() -> None:
     """Keep the human-facing handoff artifacts aligned with the verified crate."""
     review = load_json(REVIEW_MANIFEST)
@@ -237,6 +276,7 @@ def main() -> None:
     verify_counts_and_paths()
     verify_closed_gates_and_language()
     verify_nightshift_review_reports()
+    verify_nightshift_report_index()
     verify_operator_handoff_documents()
     verify_no_secrets_in_operator_docs()
     print("Bass Oracle launch verifier passed: counts, paths, handoffs, nightshift reports, closed gates, and redactions are consistent.")
