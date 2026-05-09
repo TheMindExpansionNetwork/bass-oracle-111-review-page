@@ -23,6 +23,7 @@ MORNING_HANDOFF = ROOT / "docs/reports/BASS_ORACLE_MORNING_HANDOFF_20260509-0915
 NIGHTSHIFT_REPORT_GLOB = "BASS_ORACLE_NIGHTSHIFT_REVIEW_*.md"
 NIGHTSHIFT_REPORT_INDEX_GLOB = "BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_*.md"
 MORNING_REVEAL_SAFETY_CARD_GLOB = "BASS_ORACLE_MORNING_REVEAL_SAFETY_CARD_*.md"
+WAKE_OPERATOR_DECISION_QUEUE_GLOB = "BASS_ORACLE_WAKE_OPERATOR_DECISION_QUEUE_*.md"
 
 REQUIRED_ASSETS = [
     ROOT / "docs/launch/assets/bass_oracle_111_avatar.png",
@@ -257,6 +258,52 @@ def verify_morning_reveal_safety_card() -> None:
             assert negated, f"unsafe language or secret in {relative}: {match.group(0)[:48]!r}"
 
 
+def verify_wake_operator_decision_queue() -> None:
+    """Require the latest wake-operator queue to summarize proof paths without opening gates."""
+    queues = sorted((ROOT / "docs/launch").glob(WAKE_OPERATOR_DECISION_QUEUE_GLOB))
+    assert queues, f"missing wake operator decision queue matching docs/launch/{WAKE_OPERATOR_DECISION_QUEUE_GLOB}"
+    latest_queue = queues[-1]
+    text = latest_queue.read_text(encoding="utf-8")
+    relative = latest_queue.relative_to(ROOT)
+
+    for required_path in [
+        "docs/launch/bass_oracle_launch_manifest.json",
+        "docs/review_manifest.json",
+        "docs/launch/bass_oracle_034_ready_playlist.m3u",
+        "docs/launch/bass_oracle_034_listening_review.csv",
+        "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md",
+        "docs/reports/BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_20260509-111637.md",
+        "docs/launch/BASS_ORACLE_MORNING_REVEAL_SAFETY_CARD_20260509-1201.md",
+        "docs/reports/BASS_ORACLE_STREAM_STATUS_SNAPSHOT_20260509-081615.md",
+    ]:
+        assert required_path in text, f"{relative} missing proof path: {required_path}"
+        assert (ROOT / required_path).exists(), f"wake queue proof path does not exist: {required_path}"
+
+    for phrase in [
+        "34 / 111 ready tracks",
+        "2:17:45",
+        "pending_human_listen",
+        "rtmp://[REDACTED]",
+        "External Kick/Twitch liveness is not checked, not verified, and not claimed.",
+        "Duplicate livestream pusher startup remains closed; this queue does not start streams.",
+        "Public posting, outreach, DMs, email, and form submissions: closed.",
+        "HF/private dataset uploads and public release: closed.",
+        "Cron creation, update, removal, and recursive autonomous scheduling: closed.",
+        "Secrets, `.env` values, RTMP keys, tokens, and credentials: not printed; use `[REDACTED]` only.",
+    ]:
+        assert phrase in text, f"{relative} missing decision-queue phrase: {phrase}"
+
+    decision_rows = [line for line in text.splitlines() if line.startswith("| P")]
+    assert len(decision_rows) >= 5, f"{relative} should keep at least five bounded operator decision rows"
+    for pattern in UNSAFE_OVERCLAIM_PATTERNS + SECRET_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            lowered = text.lower()
+            context = lowered[max(0, match.start() - 80): match.end() + 80]
+            negated = any(phrase in context for phrase in ["not checked", "not claimed", "not verified"])
+            assert negated, f"unsafe language or secret in {relative}: {match.group(0)[:48]!r}"
+
+
 def verify_operator_handoff_documents() -> None:
     """Keep the human-facing handoff artifacts aligned with the verified crate."""
     review = load_json(REVIEW_MANIFEST)
@@ -319,9 +366,10 @@ def main() -> None:
     verify_nightshift_review_reports()
     verify_nightshift_report_index()
     verify_morning_reveal_safety_card()
+    verify_wake_operator_decision_queue()
     verify_operator_handoff_documents()
     verify_no_secrets_in_operator_docs()
-    print("Bass Oracle launch verifier passed: counts, paths, handoffs, nightshift reports, morning reveal safety card, closed gates, and redactions are consistent.")
+    print("Bass Oracle launch verifier passed: counts, paths, handoffs, nightshift reports, morning reveal safety card, wake operator queue, closed gates, and redactions are consistent.")
 
 
 if __name__ == "__main__":
