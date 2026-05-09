@@ -18,6 +18,8 @@ FFMPEG_CONCAT = ROOT / "docs/launch/bass_oracle_034_ffmpeg_concat.txt"
 LISTENING_CSV = ROOT / "docs/launch/bass_oracle_034_listening_review.csv"
 LAUNCH_FRAMEWORK = ROOT / "docs/launch/NIGHTBUILDING_LAUNCH_FRAMEWORK.md"
 STREAM_SNAPSHOT = ROOT / "docs/reports/BASS_ORACLE_STREAM_STATUS_SNAPSHOT_20260509-081615.md"
+LISTENER_DECISION_MATRIX = ROOT / "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md"
+MORNING_HANDOFF = ROOT / "docs/reports/BASS_ORACLE_MORNING_HANDOFF_20260509-091556.md"
 
 REQUIRED_ASSETS = [
     ROOT / "docs/launch/assets/bass_oracle_111_avatar.png",
@@ -125,14 +127,57 @@ def verify_counts_and_paths() -> None:
 
 
 def verify_closed_gates_and_language() -> None:
-    for path in [LAUNCH_FRAMEWORK, STREAM_SNAPSHOT]:
+    for path in [LAUNCH_FRAMEWORK, STREAM_SNAPSHOT, LISTENER_DECISION_MATRIX, MORNING_HANDOFF]:
         assert path.exists(), f"missing safety document: {path.relative_to(ROOT)}"
-    safety_text = "\n".join(path.read_text(encoding="utf-8") for path in [LAUNCH_FRAMEWORK, STREAM_SNAPSHOT])
+    safety_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in [LAUNCH_FRAMEWORK, STREAM_SNAPSHOT, LISTENER_DECISION_MATRIX, MORNING_HANDOFF]
+    )
     for phrase in REQUIRED_CLOSED_GATE_PHRASES:
         assert phrase in safety_text, f"missing closed-gate phrase: {phrase}"
     for pattern in UNSAFE_OVERCLAIM_PATTERNS:
         match = pattern.search(safety_text)
         assert not match, f"unsafe overclaim language found: {match.group(0)!r}"
+
+
+def verify_operator_handoff_documents() -> None:
+    """Keep the human-facing handoff artifacts aligned with the verified crate."""
+    review = load_json(REVIEW_MANIFEST)
+    committed_audio_paths = {f"`{track['audio']}`" for track in review.get("tracks", [])}
+
+    matrix = LISTENER_DECISION_MATRIX.read_text(encoding="utf-8")
+    assert matrix.count("| pending_human_listen |") == EXPECTED_READY_TRACKS, (
+        "listener decision matrix must keep all 34 tracks pending by default"
+    )
+    for required_path in [
+        "docs/review_manifest.json",
+        "docs/launch/bass_oracle_launch_manifest.json",
+        "docs/launch/bass_oracle_034_ready_playlist.m3u",
+        "docs/launch/bass_oracle_034_listening_review.csv",
+        "docs/reports/BASS_ORACLE_STREAM_STATUS_SNAPSHOT_20260509-081615.md",
+    ]:
+        assert required_path in matrix, f"listener matrix missing proof path: {required_path}"
+        assert (ROOT / required_path).exists(), f"listener matrix proof path does not exist: {required_path}"
+    for audio_ref in committed_audio_paths:
+        assert audio_ref in matrix, f"listener matrix missing committed audio ref: {audio_ref}"
+
+    handoff = MORNING_HANDOFF.read_text(encoding="utf-8")
+    for required_path in [
+        "docs/index.html",
+        "docs/review_manifest.json",
+        "docs/launch/bass_oracle_launch_manifest.json",
+        "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md",
+        "docs/reports/BASS_ORACLE_STREAM_STATUS_SNAPSHOT_20260509-081615.md",
+        "docs/reports/BASS_ORACLE_NIGHTSHIFT_REVIEW_20260509-084622.md",
+    ]:
+        assert required_path in handoff, f"morning handoff missing proof path: {required_path}"
+        assert (ROOT / required_path).exists(), f"morning handoff proof path does not exist: {required_path}"
+    for phrase in [
+        "External Kick/Twitch status: not checked and not claimed.",
+        "pending_human_listen",
+        "Add a focused morning-reveal verifier or index hook",
+    ]:
+        assert phrase in handoff, f"morning handoff missing safety/next-step phrase: {phrase}"
 
 
 def verify_no_secrets_in_operator_docs() -> None:
@@ -154,8 +199,9 @@ def verify_no_secrets_in_operator_docs() -> None:
 def main() -> None:
     verify_counts_and_paths()
     verify_closed_gates_and_language()
+    verify_operator_handoff_documents()
     verify_no_secrets_in_operator_docs()
-    print("Bass Oracle launch verifier passed: counts, paths, closed gates, and redactions are consistent.")
+    print("Bass Oracle launch verifier passed: counts, paths, handoffs, closed gates, and redactions are consistent.")
 
 
 if __name__ == "__main__":
