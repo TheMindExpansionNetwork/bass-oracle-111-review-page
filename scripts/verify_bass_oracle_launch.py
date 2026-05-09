@@ -20,6 +20,7 @@ LAUNCH_FRAMEWORK = ROOT / "docs/launch/NIGHTBUILDING_LAUNCH_FRAMEWORK.md"
 STREAM_SNAPSHOT = ROOT / "docs/reports/BASS_ORACLE_STREAM_STATUS_SNAPSHOT_20260509-081615.md"
 LISTENER_DECISION_MATRIX = ROOT / "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md"
 MORNING_HANDOFF = ROOT / "docs/reports/BASS_ORACLE_MORNING_HANDOFF_20260509-091556.md"
+NIGHTSHIFT_REPORT_GLOB = "BASS_ORACLE_NIGHTSHIFT_REVIEW_*.md"
 
 REQUIRED_ASSETS = [
     ROOT / "docs/launch/assets/bass_oracle_111_avatar.png",
@@ -140,6 +141,42 @@ def verify_closed_gates_and_language() -> None:
         assert not match, f"unsafe overclaim language found: {match.group(0)!r}"
 
 
+def verify_nightshift_review_reports() -> None:
+    """Dynamically verify every timestamped nightshift review remains safe and proof-grounded."""
+    reports = sorted((ROOT / "docs/reports").glob(NIGHTSHIFT_REPORT_GLOB))
+    assert reports, f"missing nightshift review reports matching docs/reports/{NIGHTSHIFT_REPORT_GLOB}"
+
+    for report in reports:
+        text = report.read_text(encoding="utf-8")
+        relative = report.relative_to(ROOT)
+        for required in [
+            "docs/launch/bass_oracle_launch_manifest.json",
+            "closed",
+        ]:
+            assert required in text, f"{relative} missing proof/safety phrase: {required}"
+        assert ("34 ready tracks" in text or "34 / 111 tracks ready" in text or "34 / 111 ready tracks" in text), (
+            f"{relative} must cite the 34-track ready crate state"
+        )
+        lowered = text.lower()
+        assert (
+            "not claimed" in lowered
+            or "not checked" in lowered
+            or "not verified" in lowered
+            or "not** verified" in lowered
+            or "not kick/twitch liveness proof" in lowered
+        ), f"{relative} must avoid claiming external Kick/Twitch liveness"
+        assert "rtmp://[REDACTED]" in text, f"{relative} must keep RTMP evidence redacted"
+        for pattern in UNSAFE_OVERCLAIM_PATTERNS:
+            match = pattern.search(text)
+            if match:
+                context = lowered[max(0, match.start() - 80): match.end() + 80]
+                negated = any(phrase in context for phrase in ["not checked", "not claimed", "not verified", "not** verified", "not kick/twitch liveness proof"])
+                assert negated, f"unsafe overclaim language in {relative}: {match.group(0)!r}"
+        for pattern in SECRET_PATTERNS:
+            match = pattern.search(text)
+            assert not match, f"raw secret or RTMP target in {relative}: {match.group(0)[:48]!r}"
+
+
 def verify_operator_handoff_documents() -> None:
     """Keep the human-facing handoff artifacts aligned with the verified crate."""
     review = load_json(REVIEW_MANIFEST)
@@ -199,9 +236,10 @@ def verify_no_secrets_in_operator_docs() -> None:
 def main() -> None:
     verify_counts_and_paths()
     verify_closed_gates_and_language()
+    verify_nightshift_review_reports()
     verify_operator_handoff_documents()
     verify_no_secrets_in_operator_docs()
-    print("Bass Oracle launch verifier passed: counts, paths, handoffs, closed gates, and redactions are consistent.")
+    print("Bass Oracle launch verifier passed: counts, paths, handoffs, nightshift reports, closed gates, and redactions are consistent.")
 
 
 if __name__ == "__main__":
