@@ -1,0 +1,35 @@
+track_number,title,duration_seconds,bpm,keyscale,size_bytes,sha256,audio
+1,Quantum Deck,255.024,126,D minor,4080813,02a72461066a01cbdfdbebedc5e81ba51bbb08ac0d5bb7c0d24e874c7540d890,audio/001-quantum-deck.mp3
+2,Peeposhy Relay,210.024,129,B minor,3360813,4576e795bea699f001a7a96fa93d7ad38d6d4981dbe7836de110fcaf01881cd8,audio/002-peeposhy-relay.mp3
+3,Interstellar Voltage,255.024,126,A minor,4080813,fb3b6fc431a06e08d87858dccd1a8a37e8f13b3663db6c19c27ffc30d0b8a9f1,audio/003-interstellar-voltage.mp3
+4,Peeposhy Pulse,255.024,130,A major,4080813,663edcb53c5a0d4b608b47e5857b65eebeee71223365085d1e16fb2756d039b6,audio/004-peeposhy-pulse.mp3
+5,Candy Coated Pressure,270.024,127,G major,4320813,91846d759d5c1c22091504e0eef3990199f164a338b76af73a4b4a34702cc81f,audio/005-candy-coated-pressure.mp3
+6,Velvet Collider,255.024,124,B minor,4080813,510fd9176822627365c60cad40e7fdd380000efda99b6ef43e406b5f329cb600,audio/006-velvet-collider.mp3
+7,Tax Mode Oracle,225.024,130,C minor,3600813,cac4c24bdd953be29f4222d02fa8989ef1d1da4dd1e19f9b8c371f5819c39838,audio/007-tax-mode-oracle.mp3
+8,Arcade Protocol,225.024,124,D major,3600813,ca97ec5ac012a85d671decf3a55812207d6b621121643ff83e139ee13b5ca9eb,audio/008-arcade-protocol.mp3
+9,Bootleg Safe Bloom,270.024,129,D minor,4320813,6dbd260370d901a60bb4fc57c4a1d875c4c18fbe9a0e8cb4e728740376f97392,audio/009-bootleg-safe-bloom.mp3
+10,Chrome Circuit,210.024,126,G minor,3360813,320fe02603f3779ad61430032adb672fe7dd8d1a7a843f02e4d020e633b02b65,audio/010-chrome-circuit.mp3
+11,Midnight Spark,210.024,125,A minor,3360813,98f2ca18264e44e0675ce24646bd8fe731c0eb538f86c91db66ed94b43359380,audio/011-midnight-spark.mp3
+12,Interstellar Reactor,225.024,127,G major,3600813,7b39d458c3fc6de7692cbd424a12e844afd2396e0babde0a82ef84cd0466891c,audio/012-interstellar-reactor.mp3
+13,Datastream Spark,225.024,124,B minor,3600813,4d77f05068c14d120079c8994d27e9fbe548a4c03bc4dc806d151a3171ea48e2,audio/013-datastream-spark.mp3
+14,Kandi Beacon,255.024,128,A minor,4080813,a754c11477a54031b967a7886b3c18428c0c64410a792f468541c4ef7891023c,audio/014-kandi-beacon.mp3
+15,Oracle Spinner,255.024,127,C minor,4080813,ae724ac8e078e11322f1ac016f39d6d3a2f5f9d57098b86f86abfead89c6f944,audio/015-oracle-spinner.mp3
+16,Circuit Berry Jack,240.024,128,A major,3840813,b6f473ea1e583f76c97e4f013708eae0179662d6088f1a223b29666b6b5c3c1a,audio/016-circuit-berry-jack.mp3
+17,Pulse Meter,240.024,127,G major,3840813,4a4259f8049910fd5d8f7415e922998e451cb20443caea1bedb8ddd7f5450f98,audio/017-pulse-meter.mp3
+18,Turbo Wave,255.024,127,A minor,4080813,587c47ca46507e1391a0d740ca8613aba82eb09e70127ec702d10d519cb188c5,audio/018-turbo-wave.mp3
+19,Peeposhy Bassline,270.024,130,G minor,4320813,371699b5518b10a245fd1e16b28b3dbf4db4b804ab1a77ee1ba5c863bf26cb2f,audio/019-peeposhy-bassline.mp3
+20,Turbo Circuit,210.024,128,G major,3360813,6fbe8edb9733dba0eeda22ddc6a44b256566f38f60ae2c0dd2df89ddfa574935,audio/020-turbo-circuit.mp3
+21,Sugar Meter,255.024,128,D minor,4080813,ec76342a9b2db792c20bb3c73f7160a9a8cf4018fe1971e72d88afc8c0ecfb03,audio/021-sugar-meter.mp3
+22,Candy Coated Signal,240.024,125,B minor,3840813,0b55f9360514a7af3de59aec3e669fdab537505e2af115ddbbc09934a484b53b,audio/022-candy-coated-signal.mp3
+23,Hologram Strobe,270.024,126,G major,4320813,430a4c3958bbbd3039a0843987bb0d1bba6c80e0b97c750c4a28709320210b72,audio/023-hologram-strobe.mp3
+24,Turbo Loop,225.024,127,G minor,3600813,bfda96f10b4801e35b392725602f777cbd41de48f9251ff03ca5e0c841a2b54b,audio/024-turbo-loop.mp3
+25,Candy Coated Bouncer,255.024,124,B minor,4080813,8876bc1cb4f8b3a18965c27298204b68efde76586f3959171e1c0ce0cdd63168,audio/025-candy-coated-bouncer.mp3
+26,Low End Pulse,255.024,127,C minor,4080813,b37381a213ea2a62c4053bf09767518c0c743e6bd629085148677818e394838d,audio/026-low-end-pulse.mp3
+27,Photon Pulse,270.024,125,E minor,4320813,38df4bbb337518aca9fbaa86835f9b425cb84ea780f4683e8a1534713fa2086a,audio/027-photon-pulse.mp3
+28,Circuit Berry Spinner,270.024,127,F minor,4320813,85a2a05779a386966a531a40e97ed5f946d327c040c67ff5df6d1752dbc8a0fa,audio/028-circuit-berry-spinner.mp3
+29,Satellite Frequency,255.024,127,D minor,4080813,51619bb93144bf6df6ffea30a9b5337e389d3fb7fc146f2a856eeb0d92e4014f,audio/029-satellite-frequency.mp3
+30,Plasma Pulse,255.024,125,B minor,4080813,44022bc97d61e11afa7bea134188d367c8d7da9c3645ab8d446f343963e37141,audio/030-plasma-pulse.mp3
+31,Bootleg Safe Ritual,225.024,126,A major,3600813,afaa533102338e441b7ef1d195661d264e91a0f74eb5663a61e8fd743e04a862,audio/031-bootleg-safe-ritual.mp3
+32,Satellite Ritual,225.024,128,A major,3600813,af86b7828eae5c26a5561451b3d0fdbdfae1f7b11bdfc3e6f4f0c450d2fafbe0,audio/032-satellite-ritual.mp3
+33,Moonlit Voltage,225.024,126,C minor,3600813,f9229cad58bf895347785df810b2edb0bffdba98306050771de63fe39ccfcf33,audio/033-moonlit-voltage.mp3
+34,Turbo Wave 034,225.024,130,C minor,3600813,16acafd216aa8ba5a13042d47405463fc9cbeb4c08a5ba7b4da64c53c867df9a,audio/034-turbo-wave-034.mp3

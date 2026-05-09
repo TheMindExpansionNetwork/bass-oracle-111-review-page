@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bass Oracle 111 — Stopped at 034 Review</title>
+<style>
+:root{--bg:#090612;--panel:#140d24;--panel2:#1f1236;--gold:#ffd86b;--pink:#ff5bd7;--cyan:#63f7ff;--text:#f8f0ff;--muted:#bba9d6;--ok:#8dffb2;--line:rgba(255,255,255,.13)}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top left,rgba(255,91,215,.22),transparent 38%),radial-gradient(circle at top right,rgba(99,247,255,.16),transparent 35%),linear-gradient(180deg,#080511,#12091f 60%,#07040d);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45} a{color:var(--cyan)}
+header{padding:44px 20px 26px;max-width:1200px;margin:auto}.eyebrow{color:var(--gold);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.82rem}h1{font-size:clamp(2.2rem,6vw,5.2rem);line-height:.95;margin:.35rem 0;background:linear-gradient(100deg,var(--gold),var(--pink),var(--cyan));-webkit-background-clip:text;color:transparent;text-shadow:0 0 30px rgba(255,91,215,.18)}.subtitle{max-width:850px;color:var(--muted);font-size:1.12rem}.badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.badge{border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:999px;padding:9px 13px;color:#fff}.badge strong{color:var(--gold)}
+main{max-width:1200px;margin:0 auto;padding:0 20px 60px}.player{position:sticky;top:0;z-index:10;margin:20px 0;padding:16px;border:1px solid var(--line);border-radius:22px;background:rgba(15,8,28,.92);backdrop-filter:blur(14px);box-shadow:0 20px 60px rgba(0,0,0,.35)}.now{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.now-title{font-weight:900;color:var(--gold)}audio{width:100%;margin-top:12px}.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}button,.download{cursor:pointer;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));color:var(--text);border-radius:12px;padding:10px 12px;font-weight:800;text-decoration:none}button:hover,.download:hover{border-color:var(--cyan)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:20px}.card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(31,18,54,.92),rgba(20,13,36,.92));border-radius:20px;padding:16px;box-shadow:0 12px 36px rgba(0,0,0,.24)}.trackno{color:var(--cyan);font-weight:900;letter-spacing:.08em}.card h2{margin:.25rem 0 .5rem;font-size:1.18rem}.meta{color:var(--muted);font-size:.92rem}.sha{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#dacdff;font-size:.74rem;word-break:break-all;background:rgba(0,0,0,.22);padding:8px;border-radius:10px;margin-top:10px}.mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.mini button,.mini a{font-size:.84rem;padding:8px 10px}.review{margin-top:26px;border:1px solid rgba(255,216,107,.32);background:rgba(255,216,107,.07);border-radius:18px;padding:16px}.review h2{margin-top:0}.filters{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.filters input{flex:1;min-width:220px;background:#0d0818;border:1px solid var(--line);border-radius:12px;color:#fff;padding:12px}.footer{color:var(--muted);padding:30px 0}.active{outline:2px solid var(--gold);box-shadow:0 0 30px rgba(255,216,107,.14)}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Review-only crate · generation stopped</div>
+  <h1>Bass Oracle 111</h1>
+  <p class="subtitle">Stopped at Track 034. This page is a static review deck for the current 34-track bass-house crate: playable MP3s, metadata, tracklist, and checksum proof. No stream, no generator, no payment flow — just review.</p>
+  <div class="badges" id="badges"></div>
+</header>
+<main>
+  <section class="player" aria-label="Global audio player">
+    <div class="now"><div><div class="eyebrow">Now reviewing</div><div class="now-title" id="nowTitle">Select a track</div></div><a class="download" href="TRACKLIST.csv">Download tracklist CSV</a></div>
+    <audio id="audio" controls preload="metadata"></audio>
+    <div class="controls"><button id="prev">◀ Previous</button><button id="next">Next ▶</button><button id="shuffle">Shuffle Spark</button></div>
+  </section>
+  <section class="review"><h2>Review notes</h2><ul><li>34 completed tracks are included as individual MP3s under <code>audio/</code>.</li><li>The full <code>.tar.gz</code> archive is kept off this Pages repo because it is over GitHub’s 100 MB single-file limit.</li><li>Use the per-track checksums and <a href="SHA256SUMS.txt">SHA256SUMS.txt</a> to verify source integrity.</li></ul></section>
+  <div class="filters"><input id="search" placeholder="Search title, BPM, key…" /><button id="showAll">Show all</button></div>
+  <section class="grid" id="tracks"></section>
+  <section class="footer"><p>Static review page built from Bass Oracle 111 stopped-at-034 manifest. Gold = AI life. 🪩</p></section>
+</main>
+<script>
+let manifest, tracks=[], current=-1; const audio=document.getElementById('audio'), nowTitle=document.getElementById('nowTitle'), grid=document.getElementById('tracks');
+function fmt(sec){const m=Math.floor(sec/60), s=Math.round(sec%60).toString().padStart(2,'0'); return `${m}:${s}`}
+function play(i){current=i; const t=tracks[i]; audio.src=t.audio; audio.play(); nowTitle.textContent=`${String(t.track_number).padStart(3,'0')} — ${t.title}`; document.querySelectorAll('.card').forEach(c=>c.classList.remove('active')); const el=document.querySelector(`[data-idx="${i}"]`); if(el){el.classList.add('active'); el.scrollIntoView({block:'nearest',behavior:'smooth'});} }
+function card(t,i){return `<article class="card" data-idx="${i}"><div class="trackno">TRACK ${String(t.track_number).padStart(3,'0')}</div><h2>${t.title}</h2><div class="meta">${fmt(t.duration_seconds)} · ${t.bpm||'—'} BPM · ${t.keyscale||'—'} · ${(t.size_bytes/1048576).toFixed(2)} MB</div><div class="mini"><button onclick="play(${i})">Play</button><a class="download" href="${t.audio}" download>Download MP3</a></div><div class="sha">sha256: ${t.sha256}</div></article>`}
+function render(list=tracks){grid.innerHTML=list.map(t=>card(t, tracks.indexOf(t))).join('')}
+fetch('review_manifest.json').then(r=>r.json()).then(m=>{manifest=m; tracks=m.tracks; document.getElementById('badges').innerHTML=`<span class="badge"><strong>${m.complete_track_count}</strong> / ${m.target_track_count} tracks</span><span class="badge">Stopped at <strong>${String(m.last_complete_track).padStart(3,'0')}</strong></span><span class="badge">Status: <strong>review only</strong></span><span class="badge">Archive SHA256 recorded</span>`; render();});
+document.getElementById('next').onclick=()=>play((current+1+tracks.length)%tracks.length); document.getElementById('prev').onclick=()=>play((current-1+tracks.length)%tracks.length); document.getElementById('shuffle').onclick=()=>play(Math.floor(Math.random()*tracks.length)); audio.addEventListener('ended',()=>document.getElementById('next').click());
+document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase(); render(tracks.filter(t=>`${t.track_number} ${t.title} ${t.bpm} ${t.keyscale}`.toLowerCase().includes(q)));}); document.getElementById('showAll').onclick=()=>{document.getElementById('search').value=''; render();};
+</script>
+</body></html>
