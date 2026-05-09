@@ -22,6 +22,7 @@ LISTENER_DECISION_MATRIX = ROOT / "docs/launch/BASS_ORACLE_LISTENER_DECISION_MAT
 MORNING_HANDOFF = ROOT / "docs/reports/BASS_ORACLE_MORNING_HANDOFF_20260509-091556.md"
 NIGHTSHIFT_REPORT_GLOB = "BASS_ORACLE_NIGHTSHIFT_REVIEW_*.md"
 NIGHTSHIFT_REPORT_INDEX_GLOB = "BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_*.md"
+MORNING_REVEAL_SAFETY_CARD_GLOB = "BASS_ORACLE_MORNING_REVEAL_SAFETY_CARD_*.md"
 
 REQUIRED_ASSETS = [
     ROOT / "docs/launch/assets/bass_oracle_111_avatar.png",
@@ -216,6 +217,46 @@ def verify_nightshift_report_index() -> None:
         assert not match, f"unsafe language or secret in {relative_index}: {match.group(0)[:48]!r}"
 
 
+def verify_morning_reveal_safety_card() -> None:
+    """Require the latest morning reveal safety card to stay proof-grounded and closed-gate."""
+    cards = sorted((ROOT / "docs/launch").glob(MORNING_REVEAL_SAFETY_CARD_GLOB))
+    assert cards, f"missing morning reveal safety card matching docs/launch/{MORNING_REVEAL_SAFETY_CARD_GLOB}"
+    latest_card = cards[-1]
+    text = latest_card.read_text(encoding="utf-8")
+    relative = latest_card.relative_to(ROOT)
+
+    for required_path in [
+        "docs/launch/bass_oracle_launch_manifest.json",
+        "docs/review_manifest.json",
+        "docs/launch/bass_oracle_034_ready_playlist.m3u",
+        "docs/launch/bass_oracle_034_listening_review.csv",
+        "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md",
+        "docs/reports/BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_20260509-111637.md",
+    ]:
+        assert required_path in text, f"{relative} missing proof path: {required_path}"
+        assert (ROOT / required_path).exists(), f"morning reveal safety-card proof path does not exist: {required_path}"
+
+    for phrase in [
+        "34-track review crate",
+        "34 / 111 ready tracks",
+        "2:17:45",
+        "rtmp://[REDACTED]",
+        "External Kick/Twitch liveness is not checked, not verified, and not claimed.",
+        "Duplicate livestream pusher startup remains closed; this safety card does not start streams.",
+        "Cron creation/update/removal and recursive autonomous scheduling: closed.",
+        "Secrets, `.env` values, RTMP keys, tokens, and credentials: not printed; use `[REDACTED]` only.",
+    ]:
+        assert phrase in text, f"{relative} missing safety-card phrase: {phrase}"
+
+    for pattern in UNSAFE_OVERCLAIM_PATTERNS + SECRET_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            lowered = text.lower()
+            context = lowered[max(0, match.start() - 80): match.end() + 80]
+            negated = any(phrase in context for phrase in ["not checked", "not claimed", "not verified"])
+            assert negated, f"unsafe language or secret in {relative}: {match.group(0)[:48]!r}"
+
+
 def verify_operator_handoff_documents() -> None:
     """Keep the human-facing handoff artifacts aligned with the verified crate."""
     review = load_json(REVIEW_MANIFEST)
@@ -277,9 +318,10 @@ def main() -> None:
     verify_closed_gates_and_language()
     verify_nightshift_review_reports()
     verify_nightshift_report_index()
+    verify_morning_reveal_safety_card()
     verify_operator_handoff_documents()
     verify_no_secrets_in_operator_docs()
-    print("Bass Oracle launch verifier passed: counts, paths, handoffs, nightshift reports, closed gates, and redactions are consistent.")
+    print("Bass Oracle launch verifier passed: counts, paths, handoffs, nightshift reports, morning reveal safety card, closed gates, and redactions are consistent.")
 
 
 if __name__ == "__main__":
