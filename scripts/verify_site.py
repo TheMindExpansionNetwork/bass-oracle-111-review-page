@@ -17,7 +17,9 @@ for needle in [
     'audio/',
     'Operator handoff',
     'reports/BASS_ORACLE_MORNING_HANDOFF_20260509-091556.md',
-    'reports/BASS_ORACLE_NIGHTSHIFT_REVIEW_20260509-094556.md',
+    'reports/BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_20260509-111637.md',
+    'reports/BASS_ORACLE_NIGHTSHIFT_REVIEW_20260509-110126.md',
+    'launch/BASS_ORACLE_MORNING_REVEAL_SAFETY_CARD_20260509-1201.md',
     'launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md',
     'External Kick/Twitch status is not claimed',
     'no payment, outreach, upload, GPU, training, or public-release action is approved here',
@@ -25,7 +27,9 @@ for needle in [
     assert needle in html, needle
 for handoff_path in [
     docs/'reports/BASS_ORACLE_MORNING_HANDOFF_20260509-091556.md',
-    docs/'reports/BASS_ORACLE_NIGHTSHIFT_REVIEW_20260509-094556.md',
+    docs/'reports/BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_20260509-111637.md',
+    docs/'reports/BASS_ORACLE_NIGHTSHIFT_REVIEW_20260509-110126.md',
+    docs/'launch/BASS_ORACLE_MORNING_REVEAL_SAFETY_CARD_20260509-1201.md',
     docs/'launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md',
 ]:
     assert handoff_path.exists(), handoff_path
