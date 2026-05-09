@@ -1,0 +1,77 @@
+{
+  "artifact": "bass_oracle_wake_ready_operator_brief",
+  "created_utc": "2026-05-09T13:46:56Z",
+  "status": "local_draft_for_morning_handoff",
+  "increment_scope": "one small repo-only JSON brief; no stream, cron, upload, public-post, payment, GPU, training, or provider changes",
+  "crate_summary": {
+    "entity": "Bass Oracle 111",
+    "ready_tracks": 34,
+    "target_tracks": 111,
+    "total_duration_hms": "2:17:45",
+    "playlist_entries": 34,
+    "listening_review_rows": 34,
+    "default_listener_status": "pending_human_listen"
+  },
+  "stream_status_snapshot": {
+    "checked_utc": "2026-05-09T13:46:56Z",
+    "local_process_census_only": true,
+    "active_ffmpeg_processes": 1,
+    "defunct_ffmpeg_processes": 46,
+    "rtmp_target_redaction": "[REDACTED]",
+    "external_kick_twitch_liveness": "not_checked_not_verified_not_claimed",
+    "duplicate_livestream_pusher_startup": "closed_not_started"
+  },
+  "proof_paths": [
+    "docs/launch/bass_oracle_launch_manifest.json",
+    "docs/review_manifest.json",
+    "docs/launch/bass_oracle_034_ready_playlist.m3u",
+    "docs/launch/bass_oracle_034_listening_review.csv",
+    "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md",
+    "docs/reports/BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_20260509-111637.md",
+    "docs/launch/BASS_ORACLE_MORNING_REVEAL_SAFETY_CARD_20260509-1201.md",
+    "docs/launch/BASS_ORACLE_WAKE_OPERATOR_DECISION_QUEUE_20260509-1246.md",
+    "docs/launch/BASS_ORACLE_STREAM_OPERATOR_SNAPSHOT_20260509-131646.md",
+    "docs/reports/BASS_ORACLE_PRE_WAKE_HANDOFF_DELTA_20260509-1332.md"
+  ],
+  "reusable_skill": {
+    "name": "bass-oracle-playlist-crate-management",
+    "status": "available_and_verified_by_skill_view_this_run",
+    "notes": "Current skill already covers crate counts, stream redaction, listener matrices, report indexes, wake queues, stream snapshots, and morning handoff patterns. No new skill-library patch was needed for this increment."
+  },
+  "morning_operator_decisions": [
+    {
+      "id": "listen_review_first_5",
+      "label": "Listen to the first five committed review-page tracks and mark keep/fix/skip locally.",
+      "gate": "human_approval_required_before_any_public_or_stream_claim"
+    },
+    {
+      "id": "private_demo_only",
+      "label": "Open the static review page and wake operator queue as a private demo surface.",
+      "gate": "no_public_posting_no_outreach_no_payment_links"
+    },
+    {
+      "id": "stream_recovery_test_after_approval",
+      "label": "If desired, run a human-approved stream recovery test using existing tooling only.",
+      "gate": "no_duplicate_pusher_no_provider_mutation_without_human_yes"
+    },
+    {
+      "id": "continue_generation_planning",
+      "label": "Plan the remaining 77 tracks without starting GPU, paid compute, uploads, or training.",
+      "gate": "planning_only_until_human_approves_compute"
+    }
+  ],
+  "closed_gates": {
+    "public_posting": false,
+    "outreach_dm_email_forms": false,
+    "payment_links_or_revenue_claims": false,
+    "hf_or_private_dataset_upload": false,
+    "public_release": false,
+    "gpu_modal_runpod_or_training_jobs": false,
+    "model_downloads": false,
+    "cron_create_update_remove": false,
+    "stream_pusher_start_or_restart": false,
+    "restreamer_or_provider_mutation": false,
+    "secrets_printed": false
+  },
+  "recommended_next_increment": "Add a focused verifier hook for this wake-ready JSON brief, or keep the next builder loop to a human-listening decision artifact after approval."
+}
