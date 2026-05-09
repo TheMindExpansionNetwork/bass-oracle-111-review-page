@@ -24,6 +24,7 @@ NIGHTSHIFT_REPORT_GLOB = "BASS_ORACLE_NIGHTSHIFT_REVIEW_*.md"
 NIGHTSHIFT_REPORT_INDEX_GLOB = "BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_*.md"
 MORNING_REVEAL_SAFETY_CARD_GLOB = "BASS_ORACLE_MORNING_REVEAL_SAFETY_CARD_*.md"
 WAKE_OPERATOR_DECISION_QUEUE_GLOB = "BASS_ORACLE_WAKE_OPERATOR_DECISION_QUEUE_*.md"
+WAKE_READY_OPERATOR_BRIEF_GLOB = "bass_oracle_wake_ready_operator_brief_*.json"
 
 REQUIRED_ASSETS = [
     ROOT / "docs/launch/assets/bass_oracle_111_avatar.png",
@@ -304,6 +305,87 @@ def verify_wake_operator_decision_queue() -> None:
             assert negated, f"unsafe language or secret in {relative}: {match.group(0)[:48]!r}"
 
 
+def verify_wake_ready_operator_brief() -> None:
+    """Require the latest machine-readable wake brief to stay proof-grounded and closed-gate."""
+    briefs = sorted((ROOT / "docs/launch").glob(WAKE_READY_OPERATOR_BRIEF_GLOB))
+    assert briefs, f"missing wake-ready operator brief matching docs/launch/{WAKE_READY_OPERATOR_BRIEF_GLOB}"
+    latest_brief = briefs[-1]
+    brief = load_json(latest_brief)
+    relative = latest_brief.relative_to(ROOT)
+
+    assert brief.get("artifact") == "bass_oracle_wake_ready_operator_brief", f"{relative} artifact id drifted"
+    assert brief.get("status") == "local_draft_for_morning_handoff", f"{relative} must remain a local draft"
+    assert "no stream" in brief.get("increment_scope", "").lower(), f"{relative} scope must keep stream startup closed"
+
+    crate = brief.get("crate_summary", {})
+    assert crate.get("entity") == "Bass Oracle 111", f"{relative} crate entity drifted"
+    assert_count("wake-ready brief ready_tracks", int(crate.get("ready_tracks", -1)))
+    assert int(crate.get("target_tracks", -1)) == EXPECTED_TARGET_TRACKS, f"{relative} target track count drifted"
+    assert crate.get("total_duration_hms") == "2:17:45", f"{relative} total duration drifted"
+    assert_count("wake-ready brief playlist_entries", int(crate.get("playlist_entries", -1)))
+    assert_count("wake-ready brief listening_review_rows", int(crate.get("listening_review_rows", -1)))
+    assert crate.get("default_listener_status") == "pending_human_listen", f"{relative} listener status should stay pending"
+
+    stream = brief.get("stream_status_snapshot", {})
+    assert stream.get("local_process_census_only") is True, f"{relative} stream status must be local-process-only"
+    assert stream.get("rtmp_target_redaction") == "[REDACTED]", f"{relative} must not contain raw RTMP targets"
+    assert stream.get("external_kick_twitch_liveness") == "not_checked_not_verified_not_claimed", (
+        f"{relative} must not claim external Kick/Twitch liveness"
+    )
+    assert stream.get("duplicate_livestream_pusher_startup") == "closed_not_started", (
+        f"{relative} must keep duplicate pusher startup closed"
+    )
+
+    proof_paths = brief.get("proof_paths", [])
+    for required_path in [
+        "docs/launch/bass_oracle_launch_manifest.json",
+        "docs/review_manifest.json",
+        "docs/launch/bass_oracle_034_ready_playlist.m3u",
+        "docs/launch/bass_oracle_034_listening_review.csv",
+        "docs/launch/BASS_ORACLE_LISTENER_DECISION_MATRIX_20260509-0900.md",
+        "docs/reports/BASS_ORACLE_NIGHTSHIFT_REPORT_INDEX_20260509-111637.md",
+        "docs/launch/BASS_ORACLE_MORNING_REVEAL_SAFETY_CARD_20260509-1201.md",
+        "docs/launch/BASS_ORACLE_WAKE_OPERATOR_DECISION_QUEUE_20260509-1246.md",
+        "docs/launch/BASS_ORACLE_STREAM_OPERATOR_SNAPSHOT_20260509-131646.md",
+        "docs/reports/BASS_ORACLE_PRE_WAKE_HANDOFF_DELTA_20260509-1332.md",
+    ]:
+        assert required_path in proof_paths, f"{relative} missing proof path: {required_path}"
+        assert (ROOT / required_path).exists(), f"wake-ready brief proof path does not exist: {required_path}"
+
+    decisions = brief.get("morning_operator_decisions", [])
+    assert len(decisions) >= 4, f"{relative} should keep at least four morning operator decisions"
+    for decision in decisions:
+        assert "human" in decision.get("gate", "").lower() or "no_" in decision.get("gate", "").lower() or "planning_only" in decision.get("gate", "").lower(), (
+            f"{relative} decision {decision.get('id', '<missing id>')} must keep a closed/human gate"
+        )
+
+    closed_gates = brief.get("closed_gates", {})
+    for gate, value in closed_gates.items():
+        assert value is False, f"{relative} closed gate {gate} must remain false"
+    for required_gate in [
+        "public_posting",
+        "outreach_dm_email_forms",
+        "payment_links_or_revenue_claims",
+        "hf_or_private_dataset_upload",
+        "public_release",
+        "gpu_modal_runpod_or_training_jobs",
+        "cron_create_update_remove",
+        "stream_pusher_start_or_restart",
+        "restreamer_or_provider_mutation",
+        "secrets_printed",
+    ]:
+        assert required_gate in closed_gates, f"{relative} missing closed gate: {required_gate}"
+
+    text = latest_brief.read_text(encoding="utf-8")
+    for pattern in UNSAFE_OVERCLAIM_PATTERNS + SECRET_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            lowered = text.lower()
+            context = lowered[max(0, match.start() - 80): match.end() + 80]
+            negated = any(phrase in context for phrase in ["not_checked", "not verified", "not claimed"])
+            assert negated, f"unsafe language or secret in {relative}: {match.group(0)[:48]!r}"
+
+
 def verify_operator_handoff_documents() -> None:
     """Keep the human-facing handoff artifacts aligned with the verified crate."""
     review = load_json(REVIEW_MANIFEST)
@@ -367,9 +449,10 @@ def main() -> None:
     verify_nightshift_report_index()
     verify_morning_reveal_safety_card()
     verify_wake_operator_decision_queue()
+    verify_wake_ready_operator_brief()
     verify_operator_handoff_documents()
     verify_no_secrets_in_operator_docs()
-    print("Bass Oracle launch verifier passed: counts, paths, handoffs, nightshift reports, morning reveal safety card, wake operator queue, closed gates, and redactions are consistent.")
+    print("Bass Oracle launch verifier passed: counts, paths, handoffs, nightshift reports, morning reveal safety card, wake operator queue, wake-ready operator brief, closed gates, and redactions are consistent.")
 
 
 if __name__ == "__main__":
